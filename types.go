@@ -1,17 +1,17 @@
 package flag2
 
 type boolFlag struct {
-	Short string
-	Long  string
-	Desc  string
-	Val   bool
+	Short   string
+	Long    string
+	Desc    string
+	Default bool
 }
 
 type stringFlag struct {
-	Short string
-	Long  string
-	Desc  string
-	Val   string
+	Short   string
+	Long    string
+	Desc    string
+	Default string
 }
 
 type Options map[string]interface{}
