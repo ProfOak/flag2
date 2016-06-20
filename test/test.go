@@ -13,11 +13,14 @@ func main() {
 	// short flag, long flag, description, default value
 	f.AddBool("s", "short", "Test short flag", false)
 	f.AddBool("l", "long", "Test long flag", false)
+
 	// you can have multi short flags for bools
 	f.AddBool("x", "example", "Test for the multi short flag", false)
+	f.AddBool("v", "never", "This flag will never happen in this test", false)
 
 	f.AddString("n", "name", "Store a person's name", "John")
 	f.AddString("a", "age", "Store a person's age", "42")
+
 	// you cannot have multi short flags for strings
 	f.AddString("z", "zero", "Failing test for -xyz", "bad")
 
@@ -40,6 +43,7 @@ func main() {
 		"--long",   // single long arg
 		"-a", "12", // short string arg (age)
 		"--name", "billy", // long string arg
+		"--", "--never", // --never will go to args because -- denotes the end of options
 		"foot", "loose", // loose arguments (not options)
 
 	}

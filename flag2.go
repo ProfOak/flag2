@@ -109,6 +109,16 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 
 	for i := 0; i < len(argv); i++ {
 
+		// -- denotes the end of flag options
+		if argv[i] == "--" && i < len(argv)-1 {
+			args = append(args, argv[i+1:]...)
+
+			// at this point everything is allocated
+			// since there are no more options
+			// and all the arguments are stored
+			return options, args
+		}
+
 		// ========== SHORTS ==========
 		s := short_regex.FindStringSubmatch(argv[i])
 		if len(s) > 1 { // group matched!

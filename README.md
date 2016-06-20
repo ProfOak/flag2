@@ -24,6 +24,9 @@ Differences
 * Single character strings can be grouped, but only for boolean types: `-abcd` is essentially `-a, -b, -c, -d`
   * This only works for boolean type flags
 
+* `--` denotes the end of the command line flag options
+  * Everything to the right of `--` will not be counted as flags
+
 Getting started
 ---
 
