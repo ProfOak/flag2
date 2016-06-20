@@ -3,8 +3,6 @@
 ```
 ===== EXAMPLE ERROR =====
 Atribute already exists in list of strings: name
-wtf default
-wtf zero
 
 ===== COMMAND LINE ARGUMENTS =====
 [-s -xyz --long -a 12 --name billy -- --never foot loose]

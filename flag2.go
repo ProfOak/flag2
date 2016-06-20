@@ -175,14 +175,12 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 	// now assign the defaults
 	for _, j := range f.Bools {
 		if options[j.Long] == nil {
-			fmt.Println("wtf", j.Long)
 			options[j.Long] = j.Default
 		}
 	}
 
 	for _, j := range f.Strings {
 		if options[j.Long] == nil {
-			fmt.Println("wtf", j.Long)
 			options[j.Long] = j.Default
 		}
 	}
