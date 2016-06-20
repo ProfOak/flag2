@@ -16,13 +16,15 @@ func main() {
 
 	// you can have multi short flags for bools
 	f.AddBool("x", "example", "Test for the multi short flag", false)
-	f.AddBool("v", "never", "This flag will never happen in this test", false)
 
 	f.AddString("n", "name", "Store a person's name", "John")
 	f.AddString("a", "age", "Store a person's age", "42")
 
 	// you cannot have multi short flags for strings
 	f.AddString("z", "zero", "Failing test for -xyz", "bad")
+
+	// default flag usage example
+	f.AddString("d", "default", "Using the default value example", "Default Value")
 
 	// test to enter two instances of the same flag
 	if err := f.AddString("n", "name", "Store a person's name", "John"); err != nil {

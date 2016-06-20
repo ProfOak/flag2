@@ -116,7 +116,8 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 			// at this point everything is allocated
 			// since there are no more options
 			// and all the arguments are stored
-			return options, args
+			i = len(argv)
+			continue
 		}
 
 		// ========== SHORTS ==========
@@ -170,6 +171,22 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 		}
 
 	}
+	// at this point command line arguments are parsed
+	// now assign the defaults
+	for _, j := range f.Bools {
+		if options[j.Long] == nil {
+			fmt.Println("wtf", j.Long)
+			options[j.Long] = j.Default
+		}
+	}
+
+	for _, j := range f.Strings {
+		if options[j.Long] == nil {
+			fmt.Println("wtf", j.Long)
+			options[j.Long] = j.Default
+		}
+	}
+
 	return options, args
 }
 
