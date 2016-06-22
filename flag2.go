@@ -107,15 +107,15 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 	longDict = getShortLongdict(f)
 
 	// regular expressions to verify flag
-	short_regex, _ := regexp.Compile("^-([[0-9a-zA-Z]*)+$")
-	long_regex, _ := regexp.Compile("^--([0-9a-zA-Z-]+)$")
-	short_equal, _ := regexp.Compile("^-([0-9a-zA-Z])=(.*)$")
-	long_equal, _ := regexp.Compile("^--([0-9a-zA-Z-]*)=(.*)$")
+	short_regex, _ := regexp.Compile("^-([0-9a-zA-Z]+)$")
+	long_regex, _ := regexp.Compile("^--([0-9a-zA-Z]+[0-9a-zA-Z-]*)$")
+	short_equal, _ := regexp.Compile("^-([0-9a-zA-Z])=(.+)$")
+	long_equal, _ := regexp.Compile("^--([0-9a-zA-Z]+[0-9a-zA-Z-]*)=(.+)$")
 
 	for i := 0; i < len(argv); i++ {
 
 		// -- denotes the end of flag options
-		if argv[i] == "--" && i < len(argv)-1 {
+		if argv[i] == "--" && i < len(argv)-2 {
 			args = append(args, argv[i+1:]...)
 
 			// at this point everything is allocated
@@ -157,25 +157,29 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 
 		// ========== LONGS ==========
 		l := long_equal.FindStringSubmatch(argv[i])
+		// --example=string
 		if len(l) == 3 {
 			options[l[1]] = l[2]
 			used = true
 		}
 
 		l = long_regex.FindStringSubmatch(argv[i])
+		// --example string
 		if len(l) == 2 { // group matched!
 			current_long := l[1]
 
+			fmt.Println(long_str_flags)
 			// default = store true
 			if contains(long_bool_flags, current_long) {
 				options[current_long] = true
 				used = true
 
-			} else if contains(long_str_flags, argv[i]) {
+			} else if contains(long_str_flags, current_long) {
+
 				// Warning: greedy
 				// if next elemnt is a flag, it will be treated as an argument
 				// because this is what the string stores
-				if i <= len(argv)-1 {
+				if i <= len(argv)-2 {
 					// next elemnt is our string dat
 					i++
 					// can't i++ as a part of this statement
@@ -189,6 +193,7 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 		// add to arguments
 		if !used {
 			args = append(args, argv[i])
+			used = false
 		}
 
 	}
