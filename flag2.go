@@ -22,7 +22,7 @@ func (f *FlagStruct) AddBool(short string, long string, desc string, val bool) e
 		f.Bools[long] = boolFlag{short, long, desc, val}
 	} else {
 		// not empty, and already exists == no good
-		return fmt.Errorf("Atribute already exists in list of bools: %s", long)
+		return fmt.Errorf("[FlagError] Flag already exists in list of bools %s", long)
 	}
 
 	return nil
@@ -35,7 +35,7 @@ func (f *FlagStruct) AddString(short string, long string, desc string, val strin
 		f.Strings[long] = stringFlag{short, long, desc, val}
 	} else {
 		// not empty, and already exists == no good
-		return fmt.Errorf("Atribute already exists in list of strings: %s", long)
+		return fmt.Errorf("[FlagError] Flag already exists in list of strings: %s", long)
 	}
 
 	return nil
@@ -71,6 +71,9 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 
 		// contains the trainslation from SHORT to LONG
 		longDict map[string]string
+
+		// don't reuse these flags in the args
+		used bool
 	)
 
 	// remove filename from the front of the os.Args array
@@ -104,8 +107,10 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 	longDict = getShortLongdict(f)
 
 	// regular expressions to verify flag
-	short_regex, _ := regexp.Compile("^-([\\w]*)+$")
-	long_regex, _ := regexp.Compile("^--([^-]+)$")
+	short_regex, _ := regexp.Compile("^-([[0-9a-zA-Z]*)+$")
+	long_regex, _ := regexp.Compile("^--([0-9a-zA-Z-]+)$")
+	short_equal, _ := regexp.Compile("^-([0-9a-zA-Z])=(.*)$")
+	long_equal, _ := regexp.Compile("^--([0-9a-zA-Z-]*)=(.*)$")
 
 	for i := 0; i < len(argv); i++ {
 
@@ -121,8 +126,14 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 		}
 
 		// ========== SHORTS ==========
-		s := short_regex.FindStringSubmatch(argv[i])
-		if len(s) > 1 { // group matched!
+		s := short_equal.FindStringSubmatch(argv[i])
+		if len(s) == 3 {
+			options[longDict[s[1]]] = s[2]
+			used = true
+		}
+
+		s = short_regex.FindStringSubmatch(argv[i])
+		if len(s) == 2 { // group matched!
 
 			// split into "characters"
 			short_flags := strings.Split(s[1], "")
@@ -131,27 +142,36 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 				current_long := longDict[s]
 				if contains(long_bool_flags, current_long) {
 					options[current_long] = true
+					used = true
 
 				} else if len(short_flags) == 1 && i < len(argv)-1 &&
 					contains(long_str_flags, current_long) {
-					// next elemnt is our string dat
+					// next elemnet is our string data
 					i++
 					// can't i++ as a part of this statement
 					options[current_long] = argv[i]
+					used = true
 				}
 			}
 		}
 
 		// ========== LONGS ==========
-		l := long_regex.FindStringSubmatch(argv[i])
-		if len(l) > 1 { // group matched!
+		l := long_equal.FindStringSubmatch(argv[i])
+		if len(l) == 3 {
+			options[l[1]] = l[2]
+			used = true
+		}
+
+		l = long_regex.FindStringSubmatch(argv[i])
+		if len(l) == 2 { // group matched!
 			current_long := l[1]
 
 			// default = store true
 			if contains(long_bool_flags, current_long) {
 				options[current_long] = true
+				used = true
 
-			} else if contains(long_str_flags, current_long) {
+			} else if contains(long_str_flags, argv[i]) {
 				// Warning: greedy
 				// if next elemnt is a flag, it will be treated as an argument
 				// because this is what the string stores
@@ -160,13 +180,14 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 					i++
 					// can't i++ as a part of this statement
 					options[current_long] = argv[i]
+					used = true
 				}
 			}
 		}
 
 		// does not belong to a flag group
 		// add to arguments
-		if len(s) == 0 && len(l) == 0 {
+		if !used {
 			args = append(args, argv[i])
 		}
 
