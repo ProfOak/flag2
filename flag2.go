@@ -218,13 +218,13 @@ func (f FlagStruct) Usage() {
 	fmt.Println()
 	fmt.Println("--- Bools ---")
 	for _, val := range f.Bools {
-		fmt.Printf("-%s, --%s\t%s\n", val.Short, val.Long, val.Desc)
+		fmt.Printf("-%s, --%-10s\t%s\n", val.Short, val.Long, val.Desc)
 	}
 
 	fmt.Println()
 	fmt.Println("--- Strings ---")
 	for _, val := range f.Strings {
-		fmt.Printf("-%s, --%s\t%s\n", val.Short, val.Long, val.Desc)
+		fmt.Printf("-%s, --%-10s\t%s\n", val.Short, val.Long, val.Desc)
 	}
 }
 
