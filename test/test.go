@@ -18,7 +18,7 @@ func main() {
 	// you can have multi short flags for bools
 	f.AddBool("x", "example", "Test for the multi short flag", false)
 
-	f.AddString("n", "name", "Store a person's name", "John")
+	f.AddString("n", "name", "Store a person's name", "Not ProfOak")
 	f.AddString("a", "age", "Store a person's age", "42")
 
 	// you cannot have multi short flags for strings
@@ -28,7 +28,7 @@ func main() {
 	f.AddString("d", "default", "Using the default value example", "Default Value")
 
 	// equal sign in args
-	f.AddString("e", "short-equal", "Test hort + equal sign in args", "Default short eq")
+	f.AddString("e", "short-equal", "Test short + equal sign in args", "Default short eq")
 	f.AddString("q", "long-equal", "Test long + equal sign in args", "Default long eq")
 
 	// test to enter two instances of the same flag
@@ -55,7 +55,7 @@ func main() {
 		"-a", "12", // short string arg (age)
 		"-e=Equal test 1",           // Test the use of an equal sign in an argument
 		"--long-equal=Equal test 2", // Test the use of an equal sign in an argument
-		"--name", "billy",           // long string arg
+		"--name", "ProfOak",         // long string arg
 
 		// args
 		"--", "--never", // --never will go to args because -- denotes the end of options
@@ -91,6 +91,7 @@ func main() {
 		fmt.Println(key, ":", options[key])
 	}
 
+	fmt.Println()
 	fmt.Print("Args: [", strings.Join(args, ", "), "]")
 
 }
