@@ -168,7 +168,6 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 		if len(l) == 2 { // group matched!
 			current_long := l[1]
 
-			fmt.Println(long_str_flags)
 			// default = store true
 			if contains(long_bool_flags, current_long) {
 				options[current_long] = true
