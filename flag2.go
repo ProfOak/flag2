@@ -91,7 +91,7 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 	options = make(Options)
 
 	// add help flag to FlagStruct at parse time
-	f.AddBool("h", "help", "Display this message and exit", false)
+	f.AddBool("h", "help", "Display this message", false)
 	options["help"] = false
 
 	// collect keys for parsing
@@ -221,9 +221,14 @@ func (f FlagStruct) Usage() {
 	}
 
 	fmt.Println()
-	fmt.Println("--- Strings ---")
-	for _, val := range f.Strings {
-		fmt.Printf("-%s, --%-10s\t%s\n", val.Short, val.Long, val.Desc)
+
+	// only display them if they exist
+	// no need to waste space
+	if len(f.Strings) > 0 {
+		fmt.Println("--- Strings ---")
+		for _, val := range f.Strings {
+			fmt.Printf("-%s, --%-10s\t%s\n", val.Short, val.Long, val.Desc)
+		}
 	}
 }
 
