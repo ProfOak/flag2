@@ -91,8 +91,8 @@ func (f FlagStruct) Parse(argv []string) (Options, []string) {
 	options = make(Options)
 
 	// add help flag to FlagStruct at parse time
-	f.AddBool("h", "help", "Display this message and exit", true)
-	options["help"] = true
+	f.AddBool("h", "help", "Display this message and exit", false)
+	options["help"] = false
 
 	// collect keys for parsing
 	for _, s := range f.Strings {
