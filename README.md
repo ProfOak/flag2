@@ -5,7 +5,7 @@ A more traditional flag library for the go programming language
 What?
 ---
 
-A more triditional flag library for the Go programming language. I also have a long history with Python, so the implimentation code looks similar to Python's argparse class.
+A more triditional flag library for the Go programming language. I also have a long history with Python, so the implimentation code looks similar to Python's optparse class.
 
 Why?
 ---
