@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/ProfOak/flag2"
 	"strings"
-	//"os"
 )
 
 func main() {
@@ -50,6 +49,7 @@ func main() {
 		"-s",     // single short arg
 		"-xyz",   // multiple short arg
 		"--long", // single long arg
+		"-h",     // show the help dialog
 
 		// strings
 		"-a", "12", // short string arg (age)
@@ -72,10 +72,10 @@ func main() {
 	fmt.Println(f.FlagKeys())
 
 	fmt.Println()
-	fmt.Println("===== USAGE =====")
+	fmt.Println("===== USAGE FLAG =====")
 
 	// unfortunate side-effect of interfaces
-	if options["help"] == true {
+	if options["help"].(bool) {
 		f.Usage()
 	}
 
