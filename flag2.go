@@ -1,63 +1,157 @@
+// flag2 allows the use of more traditional unix-style flags in Go programs.
 package flag2
 
 import (
 	"fmt"
-	"os"
-	"regexp"
+	//"os"
+	//"regexp"
 	"strings"
 )
 
-func NewFlag() FlagStruct {
-	// kind of like a constructor
+// New instantiates memory and returns something usable
+// by the client application.
+func New() FlagStruct {
 	f := FlagStruct{}
-	f.Bools = make(map[string]boolFlag)
-	f.Strings = make(map[string]stringFlag)
+	f.bools = make(map[string]boolFlag)
+	f.strings = make(map[string]stringFlag)
+	f.ints = make(map[string]intFlag)
+	f.floats = make(map[string]floatFlag)
 	return f
 }
 
-func (f *FlagStruct) AddBool(short string, long string, desc string, val bool) error {
+// validateFlag checks to see if it can possibly be
+// added to the list of flags. If it can, return a
+// flagProps struct with details of type non-specific info.
+func (f *FlagStruct) validateFlag(metavar, short, long, desc string) (flagProps, error) {
+	var p flagProps
 
-	// check if it doesn't exist
-	if f.Bools[long] == (boolFlag{}) {
-		f.Bools[long] = boolFlag{short, long, desc, val}
-	} else {
-		// not empty, and already exists == no good
-		return fmt.Errorf("[FlagError] Flag already exists in list of bools %s", long)
+	if metavar == "" {
+		return p, fmt.Errorf("Must have metavar identifier")
+	} else if listContains(f.metavars, metavar) {
+		return p, fmt.Errorf("[%s]: Flag already exists", metavar)
+	} else if short == "" && long == "" {
+		return p, fmt.Errorf("[%s]: Must have at least one flag identifier for use in program", metavar)
+	} else if len(short) > 1 {
+		return p, fmt.Errorf("[%s]: Short must only be one character", metavar)
+	} else if strings.Contains(long, " ") {
+		return p, fmt.Errorf("[%s]: no spaces allowed in long flags", metavar)
 	}
 
+	// seems like a valid flag
+	p = flagProps{
+		Metavar: metavar,
+		Short:   short,
+		Long:    long,
+		Desc:    desc,
+	}
+	return p, nil
+}
+
+// AddBool adds a boolean flag to your command line arguments.
+// This will default to false and if selected then change to true.
+//
+// parameters:
+//     metavar (string): program's way of accessing flag value
+//     short (string): single character flag (empty quotes if none)
+//     long (string): long name flag (empty quotes if none)
+//     desc (string): help description
+//     val (bool): default value (defaults to false)
+func (f *FlagStruct) AddBool(metavar, short, long, desc string) error {
+
+	props, err := f.validateFlag(metavar, short, long, desc)
+	if err != nil {
+		return err
+	}
+
+	// valid flag
+	f.metavars = append(f.metavars, metavar)
+	f.bools[metavar] = boolFlag{
+		Props: props,
+		Value: false,
+	}
 	return nil
 }
 
-func (f *FlagStruct) AddString(short string, long string, desc string, val string) error {
+// AddString adds a string flag to your command line arguments.
+// if you don't want to use a short or a long, provide an empty string.
+//
+// parameters:
+//     metavar (string): program's way of accessing flag value
+//     short (string): single character flag (empty quotes if none)
+//     long (string): long name flag (empty quotes if none)
+//     desc (string): help description
+//     val (string): default value (empty quotes if none)
+func (f *FlagStruct) AddString(metavar, short, long, desc, val string) error {
 
-	// check if it doesn't exist
-	if f.Strings[long] == (stringFlag{}) {
-		f.Strings[long] = stringFlag{short, long, desc, val}
-	} else {
-		// not empty, and already exists == no good
-		return fmt.Errorf("[FlagError] Flag already exists in list of strings: %s", long)
+	props, err := f.validateFlag(metavar, short, long, desc)
+	if err != nil {
+		return err
 	}
 
+	// valid flag
+	f.metavars = append(f.metavars, metavar)
+	f.strings[metavar] = stringFlag{
+		Props: props,
+		Value: val,
+	}
 	return nil
 }
 
-func (f FlagStruct) FlagKeys() []string {
-	// keys = list of long flag names
+// AddInt adds a string flag to your command line arguments.
+// if you don't want to use a short or a long, provide an empty string.
+//
+// parameters:
+//     metavar (string): program's way of accessing flag value
+//     short (string): single character flag (empty quotes if none)
+//     long (string): long name flag (empty quotes if none)
+//     desc (string): help description
+//     val (int): default value
+func (f *FlagStruct) AddInt(metavar, short, long, desc string, val int) error {
 
-	var keys []string
-
-	for _, s := range f.Strings {
-		keys = append(keys, s.Long)
+	props, err := f.validateFlag(metavar, short, long, desc)
+	if err != nil {
+		return err
 	}
 
-	for _, s := range f.Bools {
-		keys = append(keys, s.Long)
+	// valid flag
+	f.metavars = append(f.metavars, metavar)
+	f.ints[metavar] = intFlag{
+		Props: props,
+		Value: val,
 	}
-
-	return keys
+	return nil
 }
 
-func (f FlagStruct) Parse(argv []string) (Options, []string) {
+// AddFloat adds a string flag to your command line arguments.
+// if you don't want to use a short or a long, provide an empty string.
+//
+// parameters:
+//     metavar (string): program's way of accessing flag value
+//     short (string): single character flag (empty quotes if none)
+//     long (string): long name flag (empty quotes if none)
+//     desc (string): help description
+//     val (float): default value
+func (f *FlagStruct) AddFloat(metavar, short, long, desc string, val float64) error {
+
+	props, err := f.validateFlag(metavar, short, long, desc)
+	if err != nil {
+		return err
+	}
+
+	// valid flag
+	f.metavars = append(f.metavars, metavar)
+	f.floats[metavar] = floatFlag{
+		Props: props,
+		Value: val,
+	}
+	return nil
+}
+
+/*
+
+// Parse will return a list of flags and arguments based on argv
+// TODO: get rid of parameters and just use argvs directly
+func (f FlagStruct) ParseArgs(argv []string) (Options, []string) {
 
 	var (
 		long_str_flags  []string
@@ -232,25 +326,4 @@ func (f FlagStruct) Usage() {
 	}
 }
 
-// ===== HELPER FUNCTIONS =====
-
-func contains(strings []string, elem string) bool {
-	for _, s := range strings {
-		if s == elem {
-			return true
-		}
-	}
-	return false
-}
-
-func getShortLongdict(f FlagStruct) map[string]string {
-	dict := make(map[string]string, 0)
-
-	for _, flag := range f.Strings {
-		dict[flag.Short] = flag.Long
-	}
-	for _, flag := range f.Bools {
-		dict[flag.Short] = flag.Long
-	}
-	return dict
-}
+*/
