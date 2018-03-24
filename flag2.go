@@ -22,27 +22,27 @@ func New() FlagStruct {
 // validateFlag checks to see if it can possibly be
 // added to the list of flags. If it can, return a
 // flagProps struct with details of type non-specific info.
-func (f *FlagStruct) validateFlag(metavar, short, long, desc string) (flagProps, error) {
+func (f *FlagStruct) validateFlag(dest, short, long, desc string) (flagProps, error) {
 	var p flagProps
 
-	if metavar == "" {
-		return p, fmt.Errorf("Must have metavar identifier")
-	} else if listContains(f.metavars, metavar) {
-		return p, fmt.Errorf("[%s]: Flag already exists", metavar)
+	if dest == "" {
+		return p, fmt.Errorf("Must have dest identifier")
+	} else if listContains(f.dests, dest) {
+		return p, fmt.Errorf("[%s]: Flag already exists", dest)
 	} else if short == "" && long == "" {
-		return p, fmt.Errorf("[%s]: Must have at least one flag identifier for use in program", metavar)
+		return p, fmt.Errorf("[%s]: Must have at least one flag identifier for use in program", dest)
 	} else if len(short) > 1 {
-		return p, fmt.Errorf("[%s]: Short must only be one character", metavar)
+		return p, fmt.Errorf("[%s]: Short must only be one character", dest)
 	} else if strings.Contains(long, " ") {
-		return p, fmt.Errorf("[%s]: no spaces allowed in long flags", metavar)
+		return p, fmt.Errorf("[%s]: no spaces allowed in long flags", dest)
 	}
 
 	// seems like a valid flag
 	p = flagProps{
-		Metavar: metavar,
-		Short:   short,
-		Long:    long,
-		Desc:    desc,
+		Dest:  dest,
+		Short: short,
+		Long:  long,
+		Desc:  desc,
 	}
 	return p, nil
 }
@@ -51,21 +51,21 @@ func (f *FlagStruct) validateFlag(metavar, short, long, desc string) (flagProps,
 // This will default to false and if selected then change to true.
 //
 // parameters:
-//     metavar (string): program's way of accessing flag value
+//     dest (string): program's way of accessing flag value
 //     short (string): single character flag (empty quotes if none)
 //     long (string): long name flag (empty quotes if none)
 //     desc (string): help description
 //     val (bool): default value (defaults to false)
-func (f *FlagStruct) AddBool(metavar, short, long, desc string) error {
+func (f *FlagStruct) AddBool(dest, short, long, desc string) error {
 
-	props, err := f.validateFlag(metavar, short, long, desc)
+	props, err := f.validateFlag(dest, short, long, desc)
 	if err != nil {
 		return err
 	}
 
 	// valid flag
-	f.metavars = append(f.metavars, metavar)
-	f.bools[metavar] = boolFlag{
+	f.dests = append(f.dests, dest)
+	f.bools[dest] = boolFlag{
 		Props: props,
 		Value: false,
 	}
@@ -76,21 +76,21 @@ func (f *FlagStruct) AddBool(metavar, short, long, desc string) error {
 // if you don't want to use a short or a long, provide an empty string.
 //
 // parameters:
-//     metavar (string): program's way of accessing flag value
+//     dest (string): program's way of accessing flag value
 //     short (string): single character flag (empty quotes if none)
 //     long (string): long name flag (empty quotes if none)
 //     desc (string): help description
 //     val (string): default value (empty quotes if none)
-func (f *FlagStruct) AddString(metavar, short, long, desc, val string) error {
+func (f *FlagStruct) AddString(dest, short, long, desc, val string) error {
 
-	props, err := f.validateFlag(metavar, short, long, desc)
+	props, err := f.validateFlag(dest, short, long, desc)
 	if err != nil {
 		return err
 	}
 
 	// valid flag
-	f.metavars = append(f.metavars, metavar)
-	f.strings[metavar] = stringFlag{
+	f.dests = append(f.dests, dest)
+	f.strings[dest] = stringFlag{
 		Props: props,
 		Value: val,
 	}
@@ -101,21 +101,21 @@ func (f *FlagStruct) AddString(metavar, short, long, desc, val string) error {
 // if you don't want to use a short or a long, provide an empty string.
 //
 // parameters:
-//     metavar (string): program's way of accessing flag value
+//     dest (string): program's way of accessing flag value
 //     short (string): single character flag (empty quotes if none)
 //     long (string): long name flag (empty quotes if none)
 //     desc (string): help description
 //     val (int): default value
-func (f *FlagStruct) AddInt(metavar, short, long, desc string, val int) error {
+func (f *FlagStruct) AddInt(dest, short, long, desc string, val int) error {
 
-	props, err := f.validateFlag(metavar, short, long, desc)
+	props, err := f.validateFlag(dest, short, long, desc)
 	if err != nil {
 		return err
 	}
 
 	// valid flag
-	f.metavars = append(f.metavars, metavar)
-	f.ints[metavar] = intFlag{
+	f.dests = append(f.dests, dest)
+	f.ints[dest] = intFlag{
 		Props: props,
 		Value: val,
 	}
@@ -126,21 +126,21 @@ func (f *FlagStruct) AddInt(metavar, short, long, desc string, val int) error {
 // if you don't want to use a short or a long, provide an empty string.
 //
 // parameters:
-//     metavar (string): program's way of accessing flag value
+//     dest (string): program's way of accessing flag value
 //     short (string): single character flag (empty quotes if none)
 //     long (string): long name flag (empty quotes if none)
 //     desc (string): help description
 //     val (float): default value
-func (f *FlagStruct) AddFloat(metavar, short, long, desc string, val float64) error {
+func (f *FlagStruct) AddFloat(dest, short, long, desc string, val float64) error {
 
-	props, err := f.validateFlag(metavar, short, long, desc)
+	props, err := f.validateFlag(dest, short, long, desc)
 	if err != nil {
 		return err
 	}
 
 	// valid flag
-	f.metavars = append(f.metavars, metavar)
-	f.floats[metavar] = floatFlag{
+	f.dests = append(f.dests, dest)
+	f.floats[dest] = floatFlag{
 		Props: props,
 		Value: val,
 	}

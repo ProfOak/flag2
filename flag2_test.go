@@ -6,7 +6,7 @@ import (
 
 // proper flag values
 const (
-	metavar     = "meta"
+	dest        = "meta"
 	short       = "s"
 	long        = "long"
 	desc        = "help description"
@@ -50,13 +50,13 @@ func TestValidateFlag(t *testing.T) {
 		err   error
 	)
 	f = New()
-	props = flagProps{metavar, short, long, desc}
-	p, err = f.validateFlag(metavar, short, long, desc)
+	props = flagProps{dest, short, long, desc}
+	p, err = f.validateFlag(dest, short, long, desc)
 
 	// check for valid flag to fail
 	if err != nil ||
 		p != props ||
-		p.Metavar != metavar ||
+		p.Dest != dest ||
 		p.Short != short ||
 		p.Long != long ||
 		p.Desc != desc {
@@ -65,19 +65,19 @@ func TestValidateFlag(t *testing.T) {
 	}
 
 	// check for duplicity
-	f.bools["metavar"] = boolFlag{
+	f.bools["dest"] = boolFlag{
 		Props: props,
 		Value: true,
 	}
-	f.metavars = append(f.metavars, metavar)
-	_, err = f.validateFlag(metavar, short, long, desc)
+	f.dests = append(f.dests, dest)
+	_, err = f.validateFlag(dest, short, long, desc)
 	if err == nil {
-		t.Error("Allowed adding multiple metavars")
+		t.Error("Allowed adding multiple dests")
 	}
 
 	// check for other bad flag structures
 	bad_flags := [][]string{
-		{"", "s", "long", "help"},            // bad metavar
+		{"", "s", "long", "help"},            // bad dest
 		{"meta", "", "", "help"},             // no flags
 		{"meta", "notshort", "long", "help"}, // short too long
 		{"meta", "s", "l o n g", "help"},     // spaces in flag name
@@ -93,40 +93,40 @@ func TestValidateFlag(t *testing.T) {
 
 func TestAddBool(t *testing.T) {
 	f := New()
-	f.AddBool(metavar, short, long, desc)
-	if f.metavars[0] != metavar {
-		t.Error("Metavar slice not being set")
-	} else if _, exists := f.bools[metavar]; !exists {
+	f.AddBool(dest, short, long, desc)
+	if f.dests[0] != dest {
+		t.Error("Dest slice not being set")
+	} else if _, exists := f.bools[dest]; !exists {
 		t.Error("Flag not added to bools map")
 	}
 }
 
 func TestAddString(t *testing.T) {
 	f := New()
-	f.AddString(metavar, short, long, desc, stringValue)
-	if f.metavars[0] != metavar {
-		t.Error("Metavar slice not being set")
-	} else if _, exists := f.strings[metavar]; !exists {
+	f.AddString(dest, short, long, desc, stringValue)
+	if f.dests[0] != dest {
+		t.Error("Dest slice not being set")
+	} else if _, exists := f.strings[dest]; !exists {
 		t.Error("Flag not added to strings map")
 	}
 }
 
 func TestAddInt(t *testing.T) {
 	f := New()
-	f.AddInt(metavar, short, long, desc, intValue)
-	if f.metavars[0] != metavar {
-		t.Error("Metavar slice not being set")
-	} else if _, exists := f.ints[metavar]; !exists {
+	f.AddInt(dest, short, long, desc, intValue)
+	if f.dests[0] != dest {
+		t.Error("Dest slice not being set")
+	} else if _, exists := f.ints[dest]; !exists {
 		t.Error("Flag not added to ints map")
 	}
 }
 
 func TestAddFloat(t *testing.T) {
 	f := New()
-	f.AddFloat(metavar, short, long, desc, floatValue)
-	if f.metavars[0] != metavar {
-		t.Error("Metavar slice not being set")
-	} else if _, exists := f.floats[metavar]; !exists {
+	f.AddFloat(dest, short, long, desc, floatValue)
+	if f.dests[0] != dest {
+		t.Error("Dest slice not being set")
+	} else if _, exists := f.floats[dest]; !exists {
 		t.Error("Flag not added to floats map")
 	}
 }

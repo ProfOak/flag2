@@ -1,10 +1,10 @@
 package flag2
 
 type flagProps struct {
-	Metavar string
-	Short   string
-	Long    string
-	Desc    string
+	Dest  string
+	Short string
+	Long  string
+	Desc  string
 }
 
 type boolFlag struct {
@@ -32,9 +32,9 @@ type Options map[string]interface{}
 // this will carry the potential flags a program can have
 // now we can use the same receiver for adding
 type FlagStruct struct {
-	metavars []string
-	bools    map[string]boolFlag
-	strings  map[string]stringFlag
-	ints     map[string]intFlag
-	floats   map[string]floatFlag
+	dests   []string
+	bools   map[string]boolFlag
+	strings map[string]stringFlag
+	ints    map[string]intFlag
+	floats  map[string]floatFlag
 }
